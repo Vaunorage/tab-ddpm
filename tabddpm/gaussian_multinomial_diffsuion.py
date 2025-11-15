@@ -4,11 +4,12 @@ and https://github.com/ehoogeboom/multinomial_diffusion
 """
 
 import torch.nn.functional as F
-import torch
 import math
 
 import numpy as np
-from .utils import *
+
+from .util import discretized_gaussian_log_likelihood, sum_except_batch, mean_flat, ohe_to_categories, log_1_min_a, \
+    log_add_exp, extract, default, log_categorical, index_to_log_onehot, sliced_logsumexp, normal_kl, FoundNANsError
 
 """
 Based in part on: https://github.com/lucidrains/denoising-diffusion-pytorch/blob/5989f4c77eafcdc6be0fb4739f0f277a6dd7f7d8/denoising_diffusion_pytorch/denoising_diffusion_pytorch.py#L281
