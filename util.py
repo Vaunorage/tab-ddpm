@@ -22,7 +22,7 @@ import tomli_w
 import torch
 from torch.nn import functional as F
 
-from tabddpm import env
+import env
 
 RawConfig = Dict[str, Any]
 Report = Dict[str, Any]

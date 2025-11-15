@@ -1,13 +1,12 @@
 import enum
 from typing import Any, Optional, Tuple, Dict, Union, cast
-from functools import partial
 
 import numpy as np
 import scipy.special
 import sklearn.metrics as skm
 
-from tabddpm import util
-from tabddpm.util import TaskType
+import util
+from util import TaskType
 
 
 class PredictionType(enum.Enum):

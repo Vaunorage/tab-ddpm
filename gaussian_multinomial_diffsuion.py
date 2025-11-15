@@ -5,7 +5,7 @@ and https://github.com/ehoogeboom/multinomial_diffusion
 
 import torch.nn.functional as F
 import math
-
+import torch
 import numpy as np
 
 from .util import discretized_gaussian_log_likelihood, sum_except_batch, mean_flat, ohe_to_categories, log_1_min_a, \

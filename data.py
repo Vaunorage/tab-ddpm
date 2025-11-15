@@ -2,7 +2,6 @@ import hashlib
 from collections import Counter
 from copy import deepcopy
 from dataclasses import astuple, dataclass, replace
-from importlib.resources import path
 from pathlib import Path
 from typing import Any, Literal, Optional, Union, cast, Tuple, Dict, List
 
@@ -18,9 +17,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial.distance import cdist
 
-from tabddpm import env, util
-from tabddpm.metrics import calculate_metrics as calculate_metrics_
-from tabddpm.util import TaskType, load_json
+import util
+from metrics import calculate_metrics as calculate_metrics_
+from util import TaskType, load_json
 
 ArrayDict = Dict[str, np.ndarray]
 TensorDict = Dict[str, torch.Tensor]

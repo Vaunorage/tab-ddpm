@@ -21,23 +21,20 @@ Usage:
     synthetic_df = model.sample(n_samples=1000)
 """
 
-import os
 import sys
 import warnings
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Literal
-from copy import deepcopy
 
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
 import matplotlib.pyplot as plt
 
-from tabddpm.data import Dataset, Transformations, transform_dataset, prepare_fast_dataloader
-from tabddpm.gaussian_multinomial_diffsuion import GaussianMultinomialDiffusion
-from tabddpm.modules import MLPDiffusion
-from tabddpm.util import TaskType
+from data import Dataset, Transformations, transform_dataset, prepare_fast_dataloader
+from gaussian_multinomial_diffsuion import GaussianMultinomialDiffusion
+from modules import MLPDiffusion
+from util import TaskType
 
 # Add the project root to path to import modules
 # Adjust this if running from different location
@@ -688,8 +685,8 @@ def plot_distributions(real_df: pd.DataFrame, synthetic_df: pd.DataFrame, save_p
 # Example usage
 if __name__ == "__main__":
     # Create sample data
-    from sklearn.datasets import make_classification, make_regression
-    
+    from sklearn.datasets import make_classification
+
     print("=" * 80)
     print("TabDDPM Example - Classification")
     print("=" * 80)
