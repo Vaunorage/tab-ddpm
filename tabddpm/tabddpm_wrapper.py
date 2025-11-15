@@ -35,14 +35,14 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 
 from tabddpm.data import Dataset, Transformations, transform_dataset, prepare_fast_dataloader
+from tabddpm.gaussian_multinomial_diffsuion import GaussianMultinomialDiffusion
+from tabddpm.modules import MLPDiffusion
 from tabddpm.util import TaskType
 
 # Add the project root to path to import modules
 # Adjust this if running from different location
 PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
-
-from tab_ddpm import GaussianMultinomialDiffusion, MLPDiffusion
 
 
 class TabDDPM:

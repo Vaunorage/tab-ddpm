@@ -1,11 +1,11 @@
-from sklearn.metrics import classification_report, r2_score, f1_score
+from sklearn.metrics import r2_score, f1_score
 import numpy as np
 import os
 from sklearn.utils import shuffle
 import zero
 from pathlib import Path
 import lib
-from tab_ddpm.modules import MLP
+from tabddpm.modules import MLP
 from skorch.regressor import NeuralNetRegressor
 from skorch.classifier import NeuralNetClassifier
 from skorch.dataset import Dataset as SkDataset
