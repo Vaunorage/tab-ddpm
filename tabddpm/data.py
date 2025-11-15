@@ -18,9 +18,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial.distance import cdist
 
-from . import env, util
-from .metrics import calculate_metrics as calculate_metrics_
-from .util import TaskType, load_json
+from tabddpm import env, util
+from tabddpm.metrics import calculate_metrics as calculate_metrics_
+from tabddpm.util import TaskType, load_json
 
 ArrayDict = Dict[str, np.ndarray]
 TensorDict = Dict[str, torch.Tensor]
@@ -218,7 +218,7 @@ def normalize(
         normalizer = sklearn.preprocessing.QuantileTransformer(
             output_distribution='normal',
             n_quantiles=max(min(X['train'].shape[0] // 30, 1000), 10),
-            subsample=1e9,
+            subsample=int(1e9),
             random_state=seed,
         )
         # noise = 1e-3
@@ -345,6 +345,26 @@ def build_target(
             y = {k: (v - mean) / std for k, v in y.items()}
             info['mean'] = mean
             info['std'] = std
+        else:  # Classification tasks (BINCLASS or MULTICLASS)
+            # Label encode the target variable
+            from sklearn.preprocessing import LabelEncoder
+            label_encoder = LabelEncoder()
+            # Ensure y_train is not object dtype before encoding
+            y_train = y['train']
+            if y_train.dtype == object or y_train.dtype.kind in ['U', 'S']:
+                # String/object dtype - needs encoding
+                y_train_encoded = label_encoder.fit_transform(y_train)
+            else:
+                # Already numeric - still fit the encoder for consistency
+                y_train_encoded = label_encoder.fit_transform(y_train)
+            y_encoded = {'train': y_train_encoded.astype(np.int64)}
+            # Encode other splits if they exist
+            for split in y.keys():
+                if split != 'train':
+                    y_encoded[split] = label_encoder.transform(y[split]).astype(np.int64)
+            y = y_encoded
+            info['label_encoder'] = label_encoder
+            info['classes'] = label_encoder.classes_
     else:
         util.raise_unknown('policy', policy)
     return y, info
@@ -482,7 +502,14 @@ class TabDataset(torch.utils.data.Dataset):
         
         self.X_num = torch.from_numpy(dataset.X_num[split]) if dataset.X_num is not None else None
         self.X_cat = torch.from_numpy(dataset.X_cat[split]) if dataset.X_cat is not None else None
-        self.y = torch.from_numpy(dataset.y[split])
+        # Ensure y is numeric (not object/string dtype)
+        y_array = dataset.y[split]
+        if y_array.dtype == object or y_array.dtype.kind in ['U', 'S']:
+            # If y is still string/object, it wasn't label encoded - do it now
+            from sklearn.preprocessing import LabelEncoder
+            le = LabelEncoder()
+            y_array = le.fit_transform(y_array)
+        self.y = torch.from_numpy(y_array)
 
         assert self.y is not None
         assert self.X_num is not None or self.X_cat is not None 
@@ -495,11 +522,14 @@ class TabDataset(torch.utils.data.Dataset):
             'y': self.y[idx].long() if self.y is not None else None,
         }
 
-        x = np.empty((0,))
+        x = None
         if self.X_num is not None:
             x = self.X_num[idx]
         if self.X_cat is not None:
-            x = torch.cat([x, self.X_cat[idx]], dim=0)
+            if x is not None:
+                x = torch.cat([x, self.X_cat[idx]], dim=0)
+            else:
+                x = self.X_cat[idx]
         return x.float(), out_dict
 
 def prepare_dataloader(
@@ -602,10 +632,17 @@ def prepare_fast_dataloader(
             X = torch.from_numpy(D.X_cat[split]).float()
     else:
         X = torch.from_numpy(D.X_num[split]).float()
-    y = torch.from_numpy(D.y[split])
+    # Ensure y is numeric
+    y_array = D.y[split]
+    if y_array.dtype == object or y_array.dtype.kind in ['U', 'S']:
+        from sklearn.preprocessing import LabelEncoder
+        le = LabelEncoder()
+        y_array = le.fit_transform(y_array)
+    y = torch.from_numpy(y_array)
     dataloader = FastTensorDataLoader(X, y, batch_size=batch_size, shuffle=(split=='train'))
     while True:
-        yield from dataloader
+        for x_batch, y_batch in dataloader:
+            yield x_batch, {'y': y_batch}
 
 def prepare_fast_torch_dataloader(
     D : Dataset,
@@ -616,7 +653,13 @@ def prepare_fast_torch_dataloader(
         X = torch.from_numpy(np.concatenate([D.X_num[split], D.X_cat[split]], axis=1)).float()
     else:
         X = torch.from_numpy(D.X_num[split]).float()
-    y = torch.from_numpy(D.y[split])
+    # Ensure y is numeric
+    y_array = D.y[split]
+    if y_array.dtype == object or y_array.dtype.kind in ['U', 'S']:
+        from sklearn.preprocessing import LabelEncoder
+        le = LabelEncoder()
+        y_array = le.fit_transform(y_array)
+    y = torch.from_numpy(y_array)
     dataloader = FastTensorDataLoader(X, y, batch_size=batch_size, shuffle=(split=='train'))
     return dataloader
 

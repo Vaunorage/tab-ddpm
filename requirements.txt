@@ -19,4 +19,6 @@ tqdm==4.62.3
 imbalanced-learn==0.7.0
 
 # tvae
-rdt==0.6.4 
+rdt==0.6.4
+
+category-encoders dython icecream libzero pyarrow rtdl skorch tqdm

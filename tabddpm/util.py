@@ -19,9 +19,8 @@ import numpy as np
 import tomli
 import tomli_w
 import torch
-import zero
 
-from . import env
+from tabddpm import env
 
 RawConfig = Dict[str, Any]
 Report = Dict[str, Any]
@@ -46,7 +45,33 @@ class TaskType(enum.Enum):
         return self.value
 
 
-class Timer(zero.Timer):
+class Timer:
+    def __init__(self):
+        self._start_time = None
+        self._elapsed_time = 0.0
+        self._is_running = False
+
+    def run(self):
+        if not self._is_running:
+            self._start_time = time.time()
+            self._is_running = True
+
+    def pause(self):
+        if self._is_running:
+            self._elapsed_time += time.time() - self._start_time
+            self._is_running = False
+
+    def reset(self):
+        self._start_time = None
+        self._elapsed_time = 0.0
+        self._is_running = False
+
+    @property
+    def elapsed(self) -> float:
+        if self._is_running:
+            return self._elapsed_time + (time.time() - self._start_time)
+        return self._elapsed_time
+
     @classmethod
     def launch(cls) -> 'Timer':
         timer = cls()

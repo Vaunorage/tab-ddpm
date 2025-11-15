@@ -10,7 +10,7 @@ import torch.optim as optim
 import zero
 from torch import Tensor
 
-from .util import TaskType
+from tabddpm.util import TaskType
 
 
 def cos_sin(x: Tensor) -> Tensor:

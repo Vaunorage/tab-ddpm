@@ -4,9 +4,9 @@ from icecream import install
 torch.set_num_threads(1)
 install()
 
-from . import env  # noqa
-from .data import *  # noqa
-from .deep import *  # noqa
-from .env import *  # noqa
-from .metrics import *  # noqa
-from .util import *  # noqa
+from tabddpm import env
+from tabddpm.data import *  # noqa
+from tabddpm.deep import *  # noqa
+from tabddpm.env import *  # noqa
+from tabddpm.metrics import *  # noqa
+from tabddpm.util import *  # noqa

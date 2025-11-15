@@ -6,8 +6,8 @@ import numpy as np
 import scipy.special
 import sklearn.metrics as skm
 
-from . import util
-from .util import TaskType
+from tabddpm import util
+from tabddpm.util import TaskType
 
 
 class PredictionType(enum.Enum):
