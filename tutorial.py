@@ -6,6 +6,9 @@ to generate synthetic data and evaluate its quality.
 """
 
 import sys
+
+from paths import HERE
+
 sys.path.insert(0, '/mnt/user-data/outputs')
 
 import pandas as pd
@@ -219,7 +222,7 @@ def tutorial_complete_workflow():
     print("STEP 9: Save TabDDPM Model for Future Use")
     print("-" * 80)
     
-    model_path = '/mnt/user-data/outputs/wine_tabddpm.pt'
+    model_path = HERE.joinpath('wine_tabddpm.pt')
     tabddpm.save(model_path)
     print(f"\n✓ Model saved to: {model_path}")
     

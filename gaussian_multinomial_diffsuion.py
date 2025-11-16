@@ -8,7 +8,7 @@ import math
 import torch
 import numpy as np
 
-from .util import discretized_gaussian_log_likelihood, sum_except_batch, mean_flat, ohe_to_categories, log_1_min_a, \
+from util import discretized_gaussian_log_likelihood, sum_except_batch, mean_flat, ohe_to_categories, log_1_min_a, \
     log_add_exp, extract, default, log_categorical, index_to_log_onehot, sliced_logsumexp, normal_kl, FoundNANsError
 
 """

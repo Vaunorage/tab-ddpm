@@ -121,11 +121,14 @@ class TabDDPM:
         self.num_classes = None
         self.empirical_class_dist = None
         self.transformations = None
-        
-        # Preprocessing objects
         self.num_transform = None
         self.cat_transform = None
-        self.y_info = {}
+        self.num_numerical_features = None
+        self.num_categorical_features = None
+        
+        # Initialize y_info if not set
+        if not hasattr(self, 'y_info') or self.y_info is None:
+            self.y_info = {}
         
     def _infer_task_type(self, y: np.ndarray) -> TaskType:
         """Infer task type from target variable"""
@@ -277,6 +280,10 @@ class TabDDPM:
             else 0
         )
         d_in = int(np.sum(K) + num_numerical_features)
+        
+        # Store feature counts for sampling after loading
+        self.num_numerical_features = num_numerical_features
+        self.num_categorical_features = int(np.sum(K))
         self.model_params['d_in'] = d_in
         
         if verbose:
@@ -452,9 +459,8 @@ class TabDDPM:
         
         # Get number of numerical features
         num_numerical_features = (
-            self.dataset.X_num['train'].shape[1] 
-            if self.dataset.X_num is not None 
-            else 0
+            self.num_numerical_features if self.num_numerical_features is not None
+            else (self.dataset.X_num['train'].shape[1] if self.dataset and self.dataset.X_num is not None else 0)
         )
         
         # Separate numerical and categorical
@@ -544,6 +550,8 @@ class TabDDPM:
             'y_info': self.y_info,
             'num_transform': self.num_transform,
             'cat_transform': self.cat_transform,
+            'num_numerical_features': self.num_numerical_features,
+            'num_categorical_features': self.num_categorical_features,
             'task_type': str(self.dataset.task_type) if self.dataset else None,
             'config': {
                 'num_timesteps': self.num_timesteps,
@@ -579,6 +587,8 @@ class TabDDPM:
         self.y_info = checkpoint['y_info']
         self.num_transform = checkpoint['num_transform']
         self.cat_transform = checkpoint['cat_transform']
+        self.num_numerical_features = checkpoint['num_numerical_features']
+        self.num_categorical_features = checkpoint['num_categorical_features']
         
         config = checkpoint['config']
         self.num_timesteps = config['num_timesteps']
