@@ -14,7 +14,7 @@ from sklearn.datasets import make_classification, make_regression, load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
-from tabddpm_wrapper import TabDDPM
+from tab_ddpm import TabDDPM
 
 
 def example_classification():
